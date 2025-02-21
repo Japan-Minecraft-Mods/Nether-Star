@@ -20,7 +20,7 @@ module.exports = {
 				.setColor(0x0099ff)
 				.setTitle('JMM専用コマンド 2/2')
 				.addFields(
-					{ name: '/pin', value: 'メッセージをピン止めします。' }
+					{ name: '/search_modrinth', value: 'Modrinth上にあるプロジェクト(Mod、Modpack、リソースパック等)を検索します' }
 				)
 				.setTimestamp()
 		];
