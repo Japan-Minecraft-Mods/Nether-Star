@@ -23,16 +23,16 @@ const deployCommands = async () => {
         }
     }
 
+    console.log('Commands to deploy:', commands); // コマンドリストを確認
+
     const rest = new REST().setToken(token);
 
     try {
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
-
         const data = await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
             { body: commands },
         );
-
         console.log(`Successfully reloaded ${data.length} application (/) commands.`);
     } catch (error) {
         console.error(error);

@@ -110,7 +110,7 @@ module.exports = {
 
       // Embed メッセージの作成
       const modEmbed = new EmbedBuilder()
-      .setColor(0x0099FF)
+      .setColor(0x1bd96a)
       .setAuthor({
         name: author,
         iconURL: authorIcon || null, // アイコンがない場合はnull
