@@ -1,16 +1,17 @@
 // 必要なファイルのインポート
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
 const { token } = require('./config.json');
-
+const deployCommands = require('./deploy-commands');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // クライアントの準備ができたら、このコードを実行します (1 回のみ)。
 // `client: Client<boolean>` と `readyClient: Client<true>` の区別は、TypeScript 開発者にとって重要です。
 // これにより、一部のプロパティが null 非許容になります。
-client.once(Events.ClientReady, readyClient => {
-	console.log(`${readyClient.user.tag}でログインしました。`);
+client.once(Events.ClientReady, async readyClient => {
+    await deployCommands();
+    console.log(`${readyClient.user.tag}でログインしました。`);
 });
 client.commands = new Collection();
 
