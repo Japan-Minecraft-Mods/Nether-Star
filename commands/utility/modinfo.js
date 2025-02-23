@@ -108,6 +108,9 @@ module.exports = {
       // カテゴリー情報の整形
       const category = modData.categories?.map(cat => cat.charAt(0).toUpperCase() + cat.slice(1)).join(', ') || 'No category';
 
+      // ローダー情報の整形
+      const loaders = modData.loaders?.map(loader => loader.charAt(0).toUpperCase() + loader.slice(1)).join(', ') || 'ローダーなし';
+
       // Embed メッセージの作成
       const modEmbed = new EmbedBuilder()
       .setColor(0x1bd96a)
@@ -121,16 +124,14 @@ module.exports = {
       .setThumbnail(modData.icon_url || '')
       .addFields(
         { name: '', value: modData.description || '概要なし' },
-        { name: 'Loader', value: modData.loaders?.join(', ') || 'ローダーなし', inline: true },
+        { name: 'Loader', value: loaders, inline: true },
         { name: 'Version', value: versionRange, inline: true },
         { name: 'Downloads', value: modData.downloads?.toLocaleString() || '0', inline: true },
       )
-      .setFooter({ text: `Modrinth ${modData.project_type || 'Mod'}  |  ${category}` })
+      .setFooter({ text: `Modrinth ${modData.project_type.charAt(0).toUpperCase() + modData.project_type.slice(1) || 'Mod'}  |  ${category}` })
       .setTimestamp(new Date(modData.published));
 
       return interaction.followUp({ embeds: [modEmbed] });
-
-
 
     } catch (error) {
       console.error('エラー詳細:', error);
