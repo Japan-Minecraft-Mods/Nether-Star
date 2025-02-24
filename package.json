@@ -4,6 +4,11 @@
   "description": "Japan Minecraft Mods用の総合bot",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "start:pm2": "pm2 start ecosystem.config.js",
+    "stop:pm2": "pm2 stop ecosystem.config.js",
+    "restart:pm2": "pm2 restart ecosystem.config.js",
+    "logs": "pm2 logs nether-star",
     "test": "test"
   },
   "author": "Nanashi",
