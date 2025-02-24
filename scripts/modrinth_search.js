@@ -1,7 +1,7 @@
 // キャッシュの設定
 const cache = new Map();
-const CACHE_TTL = 60 * 60 * 1000; // 1時間
-const RATE_LIMIT_INTERVAL = 1000; // 1リクエストごとに2秒間隔（分間30回以下）
+const CACHE_TTL = 60 * 60 * 1000; 
+const RATE_LIMIT_INTERVAL = 240; 
 let lastRequestTime = 0;
 
 // レート制限付きの fetch 関数

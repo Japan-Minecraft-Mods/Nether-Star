@@ -68,6 +68,9 @@ client.on(Events.MessageCreate, async message => {
             // MOD情報の取得
             const { modData, versionRange, author, authorIcon, authorUrl, category } = await fetchModInfo(modId);
 
+            // ローダー情報の整形
+            const loaders = modData.loaders?.map(loader => loader.charAt(0).toUpperCase() + loader.slice(1)).join(', ') || 'ローダーなし';
+
             const modEmbed = new EmbedBuilder()
                 .setColor(0x1bd96a)
                 .setAuthor({
@@ -80,11 +83,11 @@ client.on(Events.MessageCreate, async message => {
                 .setThumbnail(modData.icon_url || '')
                 .addFields(
                     { name: '', value: modData.description || '概要なし' },
-                    { name: 'Loader', value: modData.loaders?.join(', ') || 'ローダーなし', inline: true },
+                    { name: 'Loader', value: loaders, inline: true },
                     { name: 'Version', value: versionRange, inline: true },
                     { name: 'Downloads', value: modData.downloads?.toLocaleString() || '0', inline: true },
                 )
-                .setFooter({ text: `Modrinth ${modData.project_type || 'Mod'}  |  ${category}` })
+                .setFooter({ text: `Modrinth ${modData.project_type.charAt(0).toUpperCase() + modData.project_type.slice(1) || 'Mod'}  |  ${category}` })
                 .setTimestamp(new Date(modData.published));
 
             await message.channel.send({ embeds: [modEmbed] });
