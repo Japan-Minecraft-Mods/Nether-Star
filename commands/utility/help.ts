@@ -30,7 +30,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
             .setTitle(`Help: /${cmd.data.name}`)
             .setDescription(cmd.data.description)
             .addFields(
-                ...(cmd.data.options?.map(opt => ({
+                ...(cmd.data.options?.map((opt: { name: any; description: any; }) => ({
                     name: opt.name,
                     value: opt.description,
                     inline: true,
@@ -43,7 +43,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
         .setTitle('コマンド一覧')
         .setDescription('以下のコマンドが利用可能です。')
         .addFields(
-            commands.map(cmd => ({
+            commands.map((cmd: { data: { name: any; description: any; }; }) => ({
                 name: `/${cmd.data.name}`,
                 value: cmd.data.description,
                 inline: false,
