@@ -1,6 +1,5 @@
 import { Client, GatewayIntentBits, ActivityType, MessageFlags, Collection } from "discord.js";
 import { deployCommands } from "./utils/deploy-commands";
-import { REST } from "@discordjs/rest";
 import * as fs from "fs";
 import * as path from "path";
 
