@@ -59,33 +59,27 @@ client.once("ready", async () => {
         console.log("起動完了");
         client.user!.setActivity("起動完了", { type: ActivityType.Playing });
 
+        // ステータスを30秒ごとに更新
         setInterval(async () => {
             try {
-                setInterval(async () => {
-                    try {
-                            // ヘルプコマンドの案内
-                            client.user!.setActivity('ヘルプ: /help', {
-                                type: ActivityType.Custom
-                            });
-                            // ModrinthのMOD件数を取得して表示
-                            const res = await fetch("https://api.modrinth.com/v2/projects?limit=1");
-                            if (!res.ok) throw new Error(`Modrinth API エラー: ${res.status}`);
-                            const data = await res.json() as { total_hits: number };
-                            client.user!.setActivity(`ModrinthのMOD数: ${data.total_hits}`, {
-                                type: ActivityType.Custom
-                            });
-                    } catch (error) {
-                        console.error("ステータス更新エラー:", error);
-                    }
-                }, 30000); // 30秒ごとに更新
+                // ヘルプコマンドの案内
+                client.user!.setActivity('ヘルプ: /help', { type: ActivityType.Custom });
+
+                // Modrinthの統計情報を取得して表示
+                const res = await fetch('https://api.modrinth.com/v2/stats');
+                if (!res.ok) throw new Error(`Modrinth API エラー: ${res.status}`);
+                const data = await res.json() as { total_projects: number };
+
+                client.user!.setActivity(`Modrinthのプロジェクト数: ${data.total_projects}`, { type: ActivityType.Custom });
             } catch (error) {
-                console.error("ステータス更新エラー:", error);
+                console.error('ステータス更新エラー:', error);
             }
-        }, 30000); // 30秒ごとに更新 outer
+        }, 30000);
     } catch (error) {
         console.error("Bot起動エラー:", error);
     }
 });
+
 client.on('interactionCreate', async (interaction) => {
     try {
         if (interaction.isChatInputCommand()) {
