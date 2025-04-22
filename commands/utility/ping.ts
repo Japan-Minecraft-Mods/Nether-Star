@@ -1,20 +1,19 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { ChatInputCommandInteraction, CacheType } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 
-export default {
-    data: new SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Bot の応答時間を表示します'),
-    async execute(interaction: ChatInputCommandInteraction<CacheType>) {
-        // 一度仮返信してメッセージオブジェクトを取得
-        await interaction.deferReply();
-        const sent = await interaction.fetchReply() as any;
+// コマンド定義を追加
+export const data = new SlashCommandBuilder()
+    .setName('ping')
+    .setDescription('Pong!');
 
-        const latency = (sent as any).createdTimestamp - interaction.createdTimestamp;
-        const apiLatency = Math.round(interaction.client.ws.ping);
+// 実行処理を追加
+export const execute = async (interaction: ChatInputCommandInteraction): Promise<void> => {
+    const Latency = Math.round(interaction.client.ws.ping); // Botのレイテンシーを取得
 
-        await interaction.editReply(
-            `Pong! ボットの遅延: ${latency}ms, API 遅延: ${apiLatency}ms`
-        );
-    }
+    // modrinth APIのレイテンシーを取得
+    const modrinthStart = Date.now();
+    await fetch('https://api.modrinth.com/v2/'); 
+    const API_Latency = Date.now() - modrinthStart;
+    if (API_Latency < 0) return;
+    await interaction.deferReply(); // 応答を遅延させる
+    await interaction.editReply(`Pong! Botのレイテンシーは${Latency}ms, APIのレイテンシーは${API_Latency}ms`); // 応答を編集してPongを返す
 };

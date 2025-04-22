@@ -24,7 +24,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
     if (name) {
         const cmd = commands.get(name);
         if (!cmd) {
-            return interaction.reply({ content: `コマンド \`${name}\` は存在しません。`, ephemeral: true });
+            return interaction.reply({ content: `コマンド \`${name}\` は存在しません。`, flags: MessageFlags.Ephemeral });
         }
         const embed = new EmbedBuilder()
             .setTitle(`Help: /${cmd.data.name}`)
@@ -36,7 +36,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
                     inline: true,
                 })) ?? [])
             );
-        return interaction.reply({ embeds: [embed], ephemeral: true });
+        return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     }
 
     const embed = new EmbedBuilder()

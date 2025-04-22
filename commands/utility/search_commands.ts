@@ -1,5 +1,7 @@
 import type { Client, Message, TextChannel } from 'discord.js'
 import { Collection, EmbedBuilder, Colors } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { searchMod } from '../../utils/modrinth_search';
 
 interface Command {
     name: string
@@ -15,6 +17,35 @@ declare module 'discord.js' {
         commands: Collection<string, Command>
     }
 }
+
+// コマンド定義を追加
+export const data = new SlashCommandBuilder()
+    .setName('search_mod')
+    .setDescription('Modrinth で MOD を検索します')
+    .addStringOption(option =>
+        option
+            .setName('query')
+            .setDescription('検索ワード')
+            .setRequired(true)
+    );
+
+// 実行処理を追加
+export const execute = async (interaction: ChatInputCommandInteraction): Promise<void> => {
+    const query = interaction.options.getString('query', true);
+    await interaction.deferReply();
+    const results = await searchMod(query);
+
+    if (results.hits?.length) {
+        const mod = results.hits[0];
+        const embed = new EmbedBuilder()
+            .setTitle(mod.title)
+            .setURL(`https://modrinth.com/mod/${mod.id}`)
+            .setDescription(mod.description ?? '概要なし');
+        await interaction.editReply({ embeds: [embed] });
+    } else {
+        await interaction.editReply('結果が見つかりませんでした。');
+    }
+};
 
 export async function searchCommands(
     client: Client,
