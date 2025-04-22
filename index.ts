@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, ActivityType, MessageFlags, Collection } fro
 import { deployCommands } from "./utils/deploy-commands";
 import * as fs from "fs";
 import * as path from "path";
+import fetch from "node-fetch";
 
 // 相対パス (プロジェクトルート) を使うよう変更
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -60,24 +61,33 @@ client.once("ready", async () => {
 
         setInterval(async () => {
             try {
-                const joinServerCount = client.guilds.cache.size;
-                await client.user!.setActivity(`サーバー数: ${joinServerCount}`, { type: ActivityType.Custom });
-                await new Promise(resolve => setTimeout(resolve, 15000));
-                const joinVCCount = client.voice.adapters.size;
-                client.user!.setActivity(`VC: ${joinVCCount}`, { type: ActivityType.Custom });
-                await new Promise(resolve => setTimeout(resolve, 15000));
+                setInterval(async () => {
+                    try {
+                            // ヘルプコマンドの案内
+                            client.user!.setActivity('ヘルプ: /help', {
+                                type: ActivityType.Custom
+                            });
+                            // ModrinthのMOD件数を取得して表示
+                            const res = await fetch("https://api.modrinth.com/v2/projects?limit=1");
+                            if (!res.ok) throw new Error(`Modrinth API エラー: ${res.status}`);
+                            const data = await res.json() as { total_hits: number };
+                            client.user!.setActivity(`ModrinthのMOD数: ${data.total_hits}`, {
+                                type: ActivityType.Custom
+                            });
+                    } catch (error) {
+                        console.error("ステータス更新エラー:", error);
+                    }
+                }, 30000); // 30秒ごとに更新
             } catch (error) {
                 console.error("ステータス更新エラー:", error);
             }
-        }, 30000);
+        }, 30000); // 30秒ごとに更新 outer
     } catch (error) {
         console.error("Bot起動エラー:", error);
     }
 });
-
-client.on("interactionCreate", async interaction => {
+client.on('interactionCreate', async (interaction) => {
     try {
-        // スラッシュコマンド処理
         if (interaction.isChatInputCommand()) {
             const command = client.commands.get(interaction.commandName);
             if (!command) return;
@@ -111,7 +121,6 @@ client.on("interactionCreate", async interaction => {
                 }
             }
         }
-        
         // ボタンインタラクション処理
         else if (interaction.isButton()) {
             console.log(`ボタン押下: ${interaction.customId}`);
