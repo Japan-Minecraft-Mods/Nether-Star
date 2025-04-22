@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import axios from 'axios';
+import { searchMod, fetchModInfo } from '../../utils/modrinth_search';
 
 // commands/utility/modinfo.ts
 import {
-    CommandInteraction,
+    ChatInputCommandInteraction,
     EmbedBuilder,
     CacheType,
     MessageFlags
@@ -20,45 +20,41 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(
-    interaction: CommandInteraction<CacheType>
+    interaction: ChatInputCommandInteraction<CacheType>
 ) {
-    const slug = interaction.options.get('slug', true).value as string;
-    await interaction.deferReply();
+    const slug = interaction.options.getString('slug', true);
+
+    // ユーザーに一旦デファーを送信 (ephemeral にすると他の人には見えません)
+    await interaction.deferReply({});
 
     try {
-        // Modrinth API にリクエスト
-        const res = await axios.get(
-            `https://api.modrinth.com/v2/project/${encodeURIComponent(slug)}`
-        );
-        const mod = res.data;
+        // Modrinth で検索
+        const mods = await searchMod(slug);
+        if (!mods || mods.length === 0) {
+            return interaction.editReply({ content: '指定されたModが見つかりませんでした。' });
+        }
+
+        // 最初の結果を使用
+        const mod = mods[0];
+        const info = await fetchModInfo(mod.id);
 
         const embed = new EmbedBuilder()
-            .setTitle(mod.title)
+            .setTitle(info.modData.title ?? mod.title)
             .setURL(`https://modrinth.com/mod/${mod.slug}`)
-            .setDescription(mod.description?.slice(0, 2048) || '説明なし')
+            .setDescription(info.modData.description ?? '説明なし')
+            .setThumbnail(info.modData.icon_url ?? null)
             .addFields(
-                { name: '作者', value: mod.author.join(', '), inline: true },
-                {
-                    name: 'ダウンロード数',
-                    value: mod.downloads.toLocaleString(),
-                    inline: true,
-                },
-                {
-                    name: '最新バージョン',
-                    value: mod.latest_version,
-                    inline: true,
-                }
+                { name: 'ID', value: mod.id, inline: true },
+                { name: 'バージョン範囲', value: info.versionRange ?? '不明', inline: true },
+                { name: 'ダウンロード数', value: info.modData.downloads?.toString() ?? '不明', inline: true }
             )
-            .setThumbnail(mod.icon_url)
-            .setFooter({ text: `ID: ${mod.project_id}` });
+            .setFooter({ text: 'Powered by Modrinth', iconURL: 'https://modrinth.com/favicon.ico' })
+            .setTimestamp();
 
         await interaction.editReply({ embeds: [embed] });
     } catch (err) {
         console.error(err);
-        await interaction.followUp({
-            content: 'モッドが見つからないか、エラーが発生しました。',
-            flags: MessageFlags.Ephemeral
-        });
+        await interaction.editReply({ content: '情報の取得中にエラーが発生しました。' });
     }
 }
 

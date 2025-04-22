@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, ActivityType, MessageFlags, Collection, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { Client, GatewayIntentBits, ActivityType, MessageFlags, Collection } from "discord.js";
 import { deployCommands } from "./utils/deploy-commands";
 import { REST } from "@discordjs/rest";
 import * as fs from "fs";
@@ -21,8 +21,6 @@ export interface ExtendedClient extends Client {
 
 export const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] }) as ExtendedClient;
 client.commands = new Collection(); // コマンド用の Collection を作成
-
-const rest = new REST({ version: '9' }).setToken(TOKEN);
 
 // 未処理の例外をハンドリング
 process.on('uncaughtException', (error) => {
