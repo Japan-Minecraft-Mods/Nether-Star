@@ -5,3 +5,4 @@ eslint.config.js
 eslint.config.mjs
 deploy-commands.js
 data
+build
