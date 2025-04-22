@@ -65,12 +65,19 @@ client.once("ready", async () => {
                 // ヘルプコマンドの案内
                 client.user!.setActivity('ヘルプ: /help', { type: ActivityType.Custom });
 
-                // Modrinthの統計情報を取得して表示
-                const res = await fetch('https://api.modrinth.com/v2/stats');
+                // Modrinthのプロジェクトをランダムに1件取得して表示
+                const res = await fetch('https://api.modrinth.com/v2/projects_random?count=1', {
+                    method: 'GET'
+                });
                 if (!res.ok) throw new Error(`Modrinth API エラー: ${res.status}`);
-                const data = await res.json() as { total_projects: number };
-
-                client.user!.setActivity(`Modrinthのプロジェクト数: ${data.total_projects}`, { type: ActivityType.Custom });
+                const projects = await res.json() as Array<{ title: string; slug: string }>;
+                if (projects.length > 0) {
+                    const project = projects[0];
+                    client.user!.setActivity(
+                        `ランダムMOD: ${project.title}`,
+                        { type: ActivityType.Custom }
+                    );
+                }
             } catch (error) {
                 console.error('ステータス更新エラー:', error);
             }
